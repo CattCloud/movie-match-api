@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "search": "node movie.js",
-    "filter": "node filtermovie.js"
+    "filter": "node filtermovie.js",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
