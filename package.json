@@ -1,0 +1,25 @@
+{
+  "name": "movie-match-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "movie.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "search": "node movie.js",
+    "filter": "node filtermovie.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CattCloud/movie-match-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CattCloud/movie-match-api/issues"
+  },
+  "homepage": "https://github.com/CattCloud/movie-match-api#readme",
+  "dependencies": {
+    "csv-parse": "^6.1.0"
+  }
+}
