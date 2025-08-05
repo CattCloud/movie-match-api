@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/CattCloud/movie-match-api#readme",
   "dependencies": {
-    "csv-parse": "^6.1.0"
+    "csv-parse": "^6.1.0",
+    "express": "^5.1.0"
   }
 }

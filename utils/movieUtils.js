@@ -40,11 +40,42 @@ async function getMovieByTitle(inputMovie) {
   }
 }
 
+async function getMovieByID_Title(parametro) {
+  try {
+    const filePath = "./data/movies.csv"; 
+    const contenido = await fs.readFile(filePath, 'utf8');
+
+    const registros = parse(contenido, {
+      columns: true,          // convierte cada fila en un objeto con claves
+      skip_empty_lines: true,
+    });
+
+    const pelicula = registros.find(reg =>
+      reg.title && (reg.title.toLowerCase().includes(parametro.toLowerCase()) || reg.id.toLowerCase().includes(parametro.toLowerCase()))
+    );
+
+    if (!pelicula) {
+      console.log(`❌ La película "${parametro}" no se encontró`);
+      return null;
+    }
+
+    return pelicula;
+
+  } catch (error) {
+    console.error('Error al leer el archivo CSV:', error);
+    throw new Error("Error al leer el archivo CSV, no se pudieron obtener las películas disponibles");
+  }
+}
+
+
+
+
 async function getAllMovies() {
     try {
         const filePath = path.join(__dirname, '../data/movies.csv');
         const contenido = await fs.readFile(filePath, 'utf8');
     
+        //Arreglo de objetos movie
         const registros = parse(contenido, {
         columns: true,
         skip_empty_lines: true,
@@ -53,7 +84,7 @@ async function getAllMovies() {
         return registros;
     } catch (error) {
         console.error('Error al leer el archivo CSV:', error);
-        throw error;
+        throw new Error("Error al leer el archivo CSV, no se pudieron obtener las películas disponibles");
     }
 
 }
@@ -84,5 +115,35 @@ async function getMoviesByGenre(generoMovie) {
 
 }
 
+async function getGenreCounts() {
+    try {
+        const filePath = path.join(__dirname, '../data/movies.csv');
+        const contenido = await fs.readFile(filePath, 'utf8');
+    
+        //Arreglo de objetos movie
+        const registros = parse(contenido, {
+        columns: true,
+        skip_empty_lines: true,
+        });
+        const genreCounts = {};
+        registros.forEach(pelicula=>{
+          const generos=pelicula.genre.split(", ");
+          generos.forEach(genero=>{
+            //Si el genero ya esta registrado en el objeto genreCounts
+            if(genreCounts[genero]){
+              genreCounts[genero]+=1;
+            }else{
+              genreCounts[genero]=1;
+            }
+          })
+        })
+        return genreCounts;
+      }
+    catch (error) {
+        console.error('Error al leer el archivo CSV:', error);          
+    }   
+}
 
-module.exports = { getMovieByTitle,getAllMovies,getMoviesByGenre };
+
+
+module.exports = { getMovieByTitle,getAllMovies,getMoviesByGenre ,getMovieByID_Title,getGenreCounts};
