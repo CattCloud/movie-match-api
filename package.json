@@ -5,9 +5,8 @@
   "main": "movie.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "search": "node movie.js",
-    "filter": "node filtermovie.js",
-    "start": "node server.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -23,5 +22,8 @@
   "dependencies": {
     "csv-parse": "^6.1.0",
     "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }
