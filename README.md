@@ -1,64 +1,68 @@
 
-## 📘 Movie Match API – Laboratorio 09: Ecosistema Node.js
+## 📘 Movie Match API – Laboratorio 10: Servidor Express y API REST
 
-Proyecto integrador que simula una API REST para encontrar películas desde consola y servidor HTTP usando Node.js.
-
----
-
-## 🧠 Objetivos Técnicos
-
-- Comprender el entorno de ejecución Node.js vs navegador.
-- Modularizar funciones usando CommonJS.
-- Leer datos desde archivos CSV.
-- Configurar scripts personalizados con `npm`.
-- Levantar servidores HTTP básicos con `http.createServer`.
+Segunda fase del proyecto Movie Match API, enfocada en construir un servidor Express real, definir rutas RESTful y permitir interacción dinámica vía peticiones HTTP. Esta etapa introduce arquitectura de rutas, separación de responsabilidades y consultas flexibles por parámetros o queries.
 
 ---
 
-## 📂 Estructura del Proyecto
+### 🎯 Objetivos de Aprendizaje
+
+- Comprender y aplicar el concepto de rutas RESTful en Express
+- Construir un servidor Express básico con múltiples rutas y controladores
+- Separar lógica en funciones modulares reutilizables
+- Habilitar interacción completa desde navegador mediante GET dinámico y filtros
+
+---
+
+### 🧠 Conceptos Clave
+
+| Concepto | Descripción |
+|----------|-------------|
+| **RESTful** | Estilo arquitectónico basado en recursos accesibles por URL + métodos HTTP |
+| **Métodos HTTP** | Verbos como `GET`, `POST`, `PUT`, `DELETE` que definen acciones sobre datos |
+| **Rutas** | Funciones separadas que gestionan la lógica de cada endpoint en Express |
+
+---
+
+### ⚙️ Setup Inicial
+
+Preparar entorno:
+
+```bash
+npm init -y
+npm install express
+```
+
+Estructura recomendada:
 
 ```
 movie-match-api/
-├── data/
-│   └── movies.csv         # Base de datos con películas
-├── utils/
-│   └── movieUtils.js      # Funciones reutilizables
-├── movie.js               # Script principal: búsqueda por título
-├── filtermovie.js         # Script alternativo: filtrado por género
-├── server.js              # Servidor básico para mostrar película
-└── package.json           # Configuración de npm y scripts
+├── data/              # CSV con películas
+├── utils/             # movieUtils.js con lógica modular
+├── server.js          # Servidor Express + rutas RESTful
+├── package.json
+└── node_modules/
 ```
 
 ---
 
-## 🔍 Historias de Usuario + Guía de Comandos
+## 🧾 Nuevas Historias de Usuario – Fase RESTful
 
-| Historia | Descripción | Comando |
-|---------|-------------|--------|
-| **HU1** | Buscar película por título desde consola | `node movie.js "Inception"` |
-| **HU2** | Modularizar lógica en `movieUtils.js` | *(Interno, ya realizado)* |
-| **HU3** | Crear script personalizado con npm | `npm run search -- "Interstellar"` |
-| **HU4** | Responder película aleatoria por servidor | `node server.js` → accede a `http://localhost:3000` en navegador |
-| ⭐ Opcional | Filtrar películas por género | `npm run filter -- "Drama"` |
-
----
-
-## 📦 Scripts disponibles (`package.json`)
-
-```json
-"scripts": {
-  "search": "node movie.js",
-  "filter": "node filtermovie.js",
-  "start": "node server.js"
-}
-```
+| Historia | Descripción | Ruta |
+|---------|-------------|------|
+| **HU1** | Listar todas las películas disponibles | `GET /movies` |
+| **HU2** | Ver detalles de una película específica | `GET /movies/:id_or_name` |
+| **HU3** | Filtrar películas por género | `GET /movies?genre=comedy` |
+| ⭐ Extra | Mensaje de bienvenida | `GET /` |
+| ⭐ Extra | Ver estadísticas agrupadas por género | `GET /movies/stats` |
 
 ---
 
-## 🧩 Notas Técnicas
+### ✅ Checkpoints Técnicos
 
-- Usa `process.argv[2]` para capturar argumentos en consola.
-- El `--` en `npm run` separa el nombre del script y sus argumentos.
-- Se centraliza la lógica en `movieUtils.js` para mantener la limpieza y reutilización.
-
+- `/movies` devuelve JSON con todas las películas.
+- `/movies/:id_or_name` permite búsqueda flexible por ID o nombre.
+- `/movies?genre=` filtra correctamente o devuelve todo si no hay query.
+- `/` muestra mensaje de servidor activo.
+- `/movies/stats` resume cantidad de películas por género.
 
