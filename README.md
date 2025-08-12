@@ -1,5 +1,5 @@
 
-## 📘 Movie Match API – Laboratorio 10: Servidor Express y API REST
+## 📘 Movie Match API – Servidor Express y API REST
 
 Proyecto Movie Match API, enfocada en construir un servidor Express real, definir rutas RESTful y permitir interacción dinámica vía peticiones HTTP. 
 --- 
