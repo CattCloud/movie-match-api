@@ -3,6 +3,9 @@
 
 Proyecto Movie Match API, enfocada en construir un servidor Express real, definir rutas RESTful y permitir interacción dinámica vía peticiones HTTP. 
 --- 
+
+Puedes visualizar la API directamente aqui 👉 [Abrir Movie Swagger Doc](https://cattcloud.github.io/movie-match-api/)
+
 ### ⚙️ Setup Inicial
 
 Preparar entorno:
