@@ -1,3 +1,4 @@
+const { get } = require('..');
 const { readMoviesCSV, writeMovieToCSV , writeAllMoviesToCSV, deleteMovieCSV} = require('../models/movieModel');
 const { AppError } = require("../utils/AppError");
 
@@ -93,6 +94,10 @@ async function getMovieRangeYear(from, to) {
   return movies;
 }
 
+
+
+
+
 async function getMovieByDirector(params) {
   const registros = await readMoviesCSV();
   let movies = registros.filter(reg => reg.director.toLowerCase().includes(params.toLowerCase()));
@@ -101,6 +106,42 @@ async function getMovieByDirector(params) {
   }
   return movies;
 }
+
+
+
+async function getMovieByMinDuration(minutes) {
+  const registros = await readMoviesCSV();
+  let movies = registros.filter(reg => parseInt(reg.runtime_minutes) >= parseInt(minutes));
+  return {
+    minutosMinimos: minutes,
+    total: movies.length,
+    peliculas: movies
+  }
+}
+
+
+async function getMovieByMaxDuration(minutes) {
+  const registros = await readMoviesCSV();
+  let movies = registros.filter(reg => parseInt(reg.runtime_minutes) <= parseInt(minutes));
+  return {
+    minutosMaximos: minutes,
+    total: movies.length,
+    peliculas: movies
+  }
+}
+
+
+async function getMovieByRangeDuration(minminutes,maxminutes) {
+  const registros = await readMoviesCSV();
+  let movies = registros.filter(reg => (parseInt(reg.runtime_minutes) >= parseInt(minminutes)) && (parseInt(reg.runtime_minutes) <= parseInt(maxminutes)));
+  return {
+    minutosMinimos: minminutes,
+    minutosMaximos: maxminutes,
+    total: movies.length,
+    peliculas: movies
+  } 
+}
+
 
 
 async function getMovieByActor(params) {
@@ -150,6 +191,25 @@ async function getMoviesByRangeRating(ratingfrom, ratingto) {
   return movies;
 }
 
+async function getMetrics() {
+  try{
+  const registros = await readMoviesCSV();
+  const totalMovies = registros.length;
+  const totalGenres = await getGenreCounts();
+
+  const totalDirectors = new Set(registros.map(reg => reg.director)).size;
+  const totalActors = new Set(registros.flatMap(reg => reg.actors.split(", "))).size;
+  return {
+    totalMovies, 
+    totalGenres,
+    totalDirectors,
+    totalActors
+  }}
+  catch (error) {
+    throw new AppError("Error al obtener las métricas", 500, "metrics");
+  } 
+  
+}
 
 async function validateMovie(movie) {
   const {
@@ -300,6 +360,10 @@ module.exports = {
   getMoviesByFromRating,
   getMoviesByToRating,
   getMoviesByRangeRating,
+  getMetrics,
+  getMovieByMinDuration,
+  getMovieByMaxDuration,
+  getMovieByRangeDuration,  
   validateMovie,
   updateMovie,
   deleteMovie

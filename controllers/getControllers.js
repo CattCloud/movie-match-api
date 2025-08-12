@@ -1,12 +1,13 @@
-const {AppError} = require('../utils/AppError');
+const { AppError } = require('../utils/AppError');
 
 const mensajeBienvenida = (req, res) => {
     res.send('¡Bienvenido a Movie Match!');
 }
 
 const { getAllMovies } = require('../services/movieServices');
+const { get } = require('..');
 
-const getMovies = async (req, res,next) => {
+const getMovies = async (req, res, next) => {
     try {
         const orden = req.query.orden;
         const rawPage = req.query.page;
@@ -16,11 +17,11 @@ const getMovies = async (req, res,next) => {
 
         // Caso 1: sin queries → devuelve todo
         if (!rawPage && !rawLimit) {
-        const allMovies = await getAllMovies();
-        return res.status(200).json({
-            total: allMovies.length,
-            peliculas: allMovies
-        });
+            const allMovies = await getAllMovies();
+            return res.status(200).json({
+                total: allMovies.length,
+                peliculas: allMovies
+            });
         }
 
         // Caso 2: solo uno definido → completar el otro
@@ -29,13 +30,13 @@ const getMovies = async (req, res,next) => {
 
         // Validaciones
         if (isNaN(page) || page < 1) {
-        throw new AppError("`page` debe ser un número entero positivo mayor o igual a 1", 400, 'validation');
-         //return res.status(400).json({ error: "`page` debe ser un número entero positivo mayor o igual a 1" });
+            throw new AppError("`page` debe ser un número entero positivo mayor o igual a 1", 400, 'validation');
+            //return res.status(400).json({ error: "`page` debe ser un número entero positivo mayor o igual a 1" });
         }
 
         if (isNaN(limit) || limit < 1) {
-        throw new AppError("`limit` debe ser un número entero positivo mayor o igual a 1", 400, 'validation');
-        //return res.status(400).json({ error: "`limit` debe ser un número entero positivo mayor o igual a 1" });
+            throw new AppError("`limit` debe ser un número entero positivo mayor o igual a 1", 400, 'validation');
+            //return res.status(400).json({ error: "`limit` debe ser un número entero positivo mayor o igual a 1" });
         }
 
         // Obtener y paginar
@@ -47,13 +48,13 @@ const getMovies = async (req, res,next) => {
 
 
         // Ordenamiento editorial
-        if ( orden && orden === 'year') {
+        if (orden && orden === 'year') {
             allMovies.sort((a, b) => a.year - b.year); // ascendente
-        } else if ( orden && orden === 'rating') {
+        } else if (orden && orden === 'rating') {
             allMovies.sort((a, b) => b.rating - a.rating); // descendente
         } else if (orden || orden === '') {
-           throw new AppError("`orden` debe ser 'year' o 'rating'", 400, 'validation');
-           //return res.status(400).json({ error: "`orden` debe ser 'year' o 'rating'" });
+            throw new AppError("`orden` debe ser 'year' o 'rating'", 400, 'validation');
+            //return res.status(400).json({ error: "`orden` debe ser 'year' o 'rating'" });
         }
 
 
@@ -70,7 +71,7 @@ const getMovies = async (req, res,next) => {
 };
 
 
-const getMoviesByYear = async (req, res,next) => {
+const getMoviesByYear = async (req, res, next) => {
     const { getMovieByYear, getMovieByToYear, getMovieByFromYear, getMovieRangeYear } = require('../services/movieServices');
     try {
         const year = req.params.year;
@@ -113,14 +114,75 @@ const getMoviesByYear = async (req, res,next) => {
         if (movies.length > 0) {
             res.status(200).json(movies);
         } else {
-            throw new AppError(`No se encontraron películas del año ${year}`, 404, 'not_found');            
+            throw new AppError(`No se encontraron películas del año ${year}`, 404, 'not_found');
         }
     } catch (e) {
         next(e);
     }
 }
 
-const getStatsMovies = async (req, res,next) => {
+
+const getMoviesByDuration = async (req, res, next) => {
+    const {
+        getMovieByMinDuration,
+        getMovieByMaxDuration,
+        getMovieByRangeDuration
+    } = require('../services/movieServices');
+
+    try {
+        const { min, max } = req.query;
+
+        const minNum = parseInt(min);
+        const maxNum = parseInt(max);
+
+        if (min && (isNaN(minNum) || minNum < 1)) {
+            throw new AppError("`min` debe ser un número entero positivo", 400, 'validation');
+        }
+
+        if (max && (isNaN(maxNum) || maxNum < 1)) {
+            throw new AppError("`max` debe ser un número entero positivo", 400, 'validation');
+        }
+
+        // Rango
+        if (min && max) {
+            const movies = await getMovieByRangeDuration(minNum, maxNum);
+            return res.status(200).json(
+                movies.total === 0
+                    ? { mensaje: `No se encontraron películas con duración entre ${minNum} y ${maxNum} minutos`, peliculas: [] }
+                    : movies
+            );
+        }
+
+        // Solo min
+        if (min) {
+            const movies = await getMovieByMinDuration(minNum);
+            return res.status(200).json(
+                movies.total === 0
+                    ? { mensaje: `No se encontraron películas con duración mínima de ${minNum} minutos`, peliculas: [] }
+                    : movies
+            );
+        }
+
+        // Solo max
+        if (max) {
+            const movies = await getMovieByMaxDuration(maxNum);
+            return res.status(200).json(
+                movies.total === 0
+                    ? { mensaje: `No se encontraron películas con duración máxima de ${maxNum} minutos`, peliculas: [] }
+                    : movies
+            );
+        }
+
+        // Ninguno definido
+        throw new AppError("Debes especificar una duración mínima, máxima o ambas en la query ?min=X&max=Y", 400, 'validation');
+
+    } catch (e) {
+        next(e);
+    }
+};
+
+
+const getStatsMovies = async (req, res, next) => {
     const { getGenreCounts } = require('../services/movieServices');
     try {
         const genreCounts = await getGenreCounts();
@@ -132,7 +194,7 @@ const getStatsMovies = async (req, res,next) => {
 }
 
 
-const getMovieById_Nombre = async (req, res,next) => {
+const getMovieById_Nombre = async (req, res, next) => {
     const { getMovieByID_Title } = require('../services/movieServices');
     try {
         const pelicula = await getMovieByID_Title(req.params.id_nombre);
@@ -151,7 +213,7 @@ const getMovieById_Nombre = async (req, res,next) => {
 
 
 
-const getMoviesByGenre = async (req, res,next) => {
+const getMoviesByGenre = async (req, res, next) => {
     const { getMoviesByGenre } = require('../services/movieServices');
     try {
         const genero = req.params.genre;
@@ -168,7 +230,7 @@ const getMoviesByGenre = async (req, res,next) => {
     }
 }
 
-const getGenre = async (req, res,next) => {
+const getGenre = async (req, res, next) => {
     const { getGenre } = require('../services/movieServices');
     try {
         const genres = await getGenre();
@@ -180,7 +242,7 @@ const getGenre = async (req, res,next) => {
 }
 
 
-const getMoviesByGenreStats = async (req, res,next) => {
+const getMoviesByGenreStats = async (req, res, next) => {
     const { getMoviesByGenre } = require('../services/movieServices');
     try {
         const genero = req.params.genre;
@@ -206,7 +268,7 @@ const getMoviesByGenreStats = async (req, res,next) => {
 }
 
 
-const getMovieByActor = async (req, res,next) => {
+const getMovieByActor = async (req, res, next) => {
     const { getMovieByActor } = require('../services/movieServices');
     try {
         const actor = req.params.name;
@@ -217,7 +279,7 @@ const getMovieByActor = async (req, res,next) => {
         if (peliculas.length > 0) {
             res.status(200).json(peliculas);
         } else {
-            throw new AppError('No se encontraron películas para el actor' + ` ${actor}`, 404, 'not_found');    
+            throw new AppError('No se encontraron películas para el actor' + ` ${actor}`, 404, 'not_found');
             //res.status(404).json({ error: 'No se encontraron películas para el actor' + ` ${actor}` });
         }
     } catch (error) {
@@ -226,7 +288,7 @@ const getMovieByActor = async (req, res,next) => {
     }
 }
 
-const getMovieByDirector = async (req, res,next) => {
+const getMovieByDirector = async (req, res, next) => {
     const { getMovieByDirector } = require('../services/movieServices');
     try {
         const director = req.params.name;
@@ -247,7 +309,7 @@ const getMovieByDirector = async (req, res,next) => {
     }
 }
 
-const getMoviesByRating = async (req, res,next) => {
+const getMoviesByRating = async (req, res, next) => {
     const { getMoviesByRating, getMoviesByFromRating, getMoviesByToRating, getMoviesByRangeRating } = require('../services/movieServices');
     try {
         const rating = req.params.rating;
@@ -295,6 +357,16 @@ const getMoviesByRating = async (req, res,next) => {
 }
 
 
+const getMetrics = async (req, res, next) => {
+    const { getMetrics } = require('../services/movieServices');
+    try {
+        const metrics = await getMetrics();
+        res.status(200).json(metrics);
+    } catch (error) {
+        next(error);
+    }
+}
+
 
 module.exports = {
     mensajeBienvenida
@@ -308,5 +380,7 @@ module.exports = {
     , getMovieByActor
     , getMovieByDirector
     , getMoviesByRating
+    , getMetrics
+    , getMoviesByDuration
 }
 

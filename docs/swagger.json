@@ -358,6 +358,66 @@
         }
       }
     },
+    "/movies/metrics": {
+      "get": {
+        "summary": "Obtener métricas generales de las películas",
+        "tags": [
+          "Movies"
+        ],
+        "description": "Retorna estadísticas agregadas como cantidad total de películas, géneros, directores y actores únicos.",
+        "responses": {
+          "200": {
+            "description": "Métricas obtenidas exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "totalMovies": {
+                      "type": "integer",
+                      "example": 120,
+                      "description": "Número total de películas registradas"
+                    },
+                    "totalGenres": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "integer"
+                      },
+                      "example": {
+                        "Drama": 45,
+                        "Comedia": 30,
+                        "Acción": 25
+                      },
+                      "description": "Conteo por género"
+                    },
+                    "totalDirectors": {
+                      "type": "integer",
+                      "example": 35,
+                      "description": "Número de directores únicos"
+                    },
+                    "totalActors": {
+                      "type": "integer",
+                      "example": 150,
+                      "description": "Número de actores únicos"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno al obtener las métricas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/movies/genre": {
       "get": {
         "summary": "Obtener lista de géneros disponibles",
@@ -510,6 +570,144 @@
                       }
                     }
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/movies/duration": {
+      "get": {
+        "summary": "Filtrar películas por duración mínima, máxima o rango",
+        "tags": [
+          "Movies - Filter"
+        ],
+        "description": "Permite obtener películas cuya duración sea mayor, menor o dentro de un rango específico en minutos.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "min",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Duración mínima en minutos. Debe ser un número entero positivo."
+          },
+          {
+            "in": "query",
+            "name": "max",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "description": "Duración máxima en minutos. Debe ser un número entero positivo."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Películas filtradas exitosamente por duración",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minutosMinimos": {
+                          "type": "integer",
+                          "example": 120
+                        },
+                        "total": {
+                          "type": "integer",
+                          "example": 5
+                        },
+                        "peliculas": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Movie"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minutosMaximos": {
+                          "type": "integer",
+                          "example": 90
+                        },
+                        "total": {
+                          "type": "integer",
+                          "example": 3
+                        },
+                        "peliculas": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Movie"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "minutosMinimos": {
+                          "type": "integer",
+                          "example": 100
+                        },
+                        "minutosMaximos": {
+                          "type": "integer",
+                          "example": 150
+                        },
+                        "total": {
+                          "type": "integer",
+                          "example": 7
+                        },
+                        "peliculas": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Movie"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "mensaje": {
+                          "type": "string",
+                          "example": "No se encontraron películas con duración entre 100 y 150 minutos"
+                        },
+                        "peliculas": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Movie"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error de validación en los parámetros de duración",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }

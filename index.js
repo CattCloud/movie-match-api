@@ -192,10 +192,12 @@ const swaggerUiOptions = {
 };
 
 // Ruta de documentación , solo en desarrollo
-if (isDev) {
-  app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs, swaggerUiOptions));
-}
-//app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs, swaggerUiOptions));
+//if (isDev) {
+//  app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs, swaggerUiOptions));
+//}
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs, swaggerUiOptions));
+
+
 
 // Rutas principales
 const routes = require('./routes/rutasGet'); // Ajusta según tu estructura
@@ -216,3 +218,12 @@ app.listen(PORT, () => {
 
 module.exports = app;
 
+
+
+/*
+const fs = require('fs');
+const swaggerJSDoc = require('swagger-jsdoc');
+const swaggerSpec = swaggerJSDoc(swaggerOptions);
+fs.writeFileSync('./docs/swagger.json', JSON.stringify(swaggerSpec, null, 2));
+console.log('✅ swagger.json generado en /docs');
+*/
