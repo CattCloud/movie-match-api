@@ -1,68 +1,67 @@
 
-## 📘 Movie Match API – Laboratorio 10: Servidor Express y API REST
+## 📘 Movie Match API – Servidor Express y API REST
 
-Segunda fase del proyecto Movie Match API, enfocada en construir un servidor Express real, definir rutas RESTful y permitir interacción dinámica vía peticiones HTTP. Esta etapa introduce arquitectura de rutas, separación de responsabilidades y consultas flexibles por parámetros o queries.
+Proyecto Movie Match API, enfocada en construir un servidor Express real, definir rutas RESTful y permitir interacción dinámica vía peticiones HTTP. 
+--- 
 
----
-
-### 🎯 Objetivos de Aprendizaje
-
-- Comprender y aplicar el concepto de rutas RESTful en Express
-- Construir un servidor Express básico con múltiples rutas y controladores
-- Separar lógica en funciones modulares reutilizables
-- Habilitar interacción completa desde navegador mediante GET dinámico y filtros
-
----
-
-### 🧠 Conceptos Clave
-
-| Concepto | Descripción |
-|----------|-------------|
-| **RESTful** | Estilo arquitectónico basado en recursos accesibles por URL + métodos HTTP |
-| **Métodos HTTP** | Verbos como `GET`, `POST`, `PUT`, `DELETE` que definen acciones sobre datos |
-| **Rutas** | Funciones separadas que gestionan la lógica de cada endpoint en Express |
-
----
+Puedes visualizar la API directamente aqui 👉 [Abrir Movie Swagger Doc](https://cattcloud.github.io/movie-match-api/)
 
 ### ⚙️ Setup Inicial
 
 Preparar entorno:
 
 ```bash
-npm init -y
-npm install express
+# 1. Clona el repositorio
+git clone https://github.com/CattCloud/movie-match-api.git
+cd movie-match-api
+
+# 2. Instala las dependencias
+npm install
+
+# 3. Coloco en el archivo .env tus variables de entorno
+# Ejemplo:
+echo "PORT=3000" > .env
+
+# 4. Ejecuta en modo desarrollo con reinicio automático
+npm run dev
+
+# 5. (Opcional) Valida la documentación Swagger
+npm run validate-swagger
 ```
 
-Estructura recomendada:
+
+Estructura de carpetas:
 
 ```
-movie-match-api/
-├── data/              # CSV con películas
-├── utils/             # movieUtils.js con lógica modular
-├── server.js          # Servidor Express + rutas RESTful
+MOVIE-MATCH-API/
+├── controllers/         # Lógica por método HTTP
+│   ├── deleteController.js
+│   ├── getControllers.js
+│   ├── postController.js
+│   └── putController.js
+├── data/                # Fuente CSV de películas
+│   └── movies.csv
+├── docs/                # Swagger UI y documentación
+│   └── swagger.json
+│   └── index.html       # Visualizador Swagger (GitHub Pages)
+├── middleware/          # CORS, auth, logger, error handler
+│   ├── authMiddleware.js
+│   ├── cors.js
+│   ├── errorHandler.js
+│   └── logger.js
+├── models/              # Modelo de película
+│   └── movieModel.js
+├── routes/              # Rutas Express
+│   └── rutasGet.js
+├── services/            # Lógica de negocio
+│   └── movieServices.js
+├── utils/               # Utilidades y errores personalizados
+│   └── AppError.js
+├── .env                 # Variables de entorno
+├── .gitignore
+├── index.js             # Punto de entrada del servidor
+├── package-lock.json
 ├── package.json
-└── node_modules/
+└── README.md
+└── validateSwagger.js 
 ```
-
----
-
-## 🧾 Nuevas Historias de Usuario – Fase RESTful
-
-| Historia | Descripción | Ruta |
-|---------|-------------|------|
-| **HU1** | Listar todas las películas disponibles | `GET /movies` |
-| **HU2** | Ver detalles de una película específica | `GET /movies/:id_or_name` |
-| **HU3** | Filtrar películas por género | `GET /movies?genre=comedy` |
-| ⭐ Extra | Mensaje de bienvenida | `GET /` |
-| ⭐ Extra | Ver estadísticas agrupadas por género | `GET /movies/stats` |
-
----
-
-### ✅ Checkpoints Técnicos
-
-- `/movies` devuelve JSON con todas las películas.
-- `/movies/:id_or_name` permite búsqueda flexible por ID o nombre.
-- `/movies?genre=` filtra correctamente o devuelve todo si no hay query.
-- `/` muestra mensaje de servidor activo.
-- `/movies/stats` resume cantidad de películas por género.
-
