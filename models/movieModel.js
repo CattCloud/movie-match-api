@@ -19,7 +19,7 @@ async function readMoviesCSV() {
     if (!Array.isArray(movies) || movies.length === 0) {
       throw new AppError("El archivo CSV está vacío o mal formateado", 400, "csv");
     }
-    console.log(movies)
+    //console.log(movies)
 
     return movies;
   } catch (err) {

@@ -212,10 +212,27 @@ async function getMetrics() {
 }
 
 async function validateMovie(movie) {
+  const allowedFields = [
+    "id", "title", "year", "genre", "director",
+    "actors", "plot", "imdb_rating", "runtime_minutes"
+  ];
+
+  const movieKeys = Object.keys(movie);
+  const unknownFields = movieKeys.filter(key => !allowedFields.includes(key));
+
+  if (unknownFields.length > 0) {
+    throw new AppError(
+      `Campos desconocidos detectados: ${unknownFields.join(", ")}`,
+      400,
+      "validación"
+    );
+  }
+
   const {
     id, title, year, genre, director,
     actors, plot, imdb_rating, runtime_minutes
   } = movie;
+
   try {
     // Validaciones estructurales
     if (!id || !/^tt\d+$/.test(id)) {
@@ -239,7 +256,7 @@ async function validateMovie(movie) {
     }
 
     // Validación de unicidad
-    const movies = await getAllMovies(); // lectura desde CSV o DB
+    const movies = await getAllMovies();
 
     const idExists = movies.some(m => m.id === id);
     const titleExists = movies.some(m => m.title.toLowerCase() === title.toLowerCase());
@@ -256,7 +273,6 @@ async function validateMovie(movie) {
   } catch (err) {
     throw err;
   }
-
 }
 
 async function updateMovie(id, updatedData) {
